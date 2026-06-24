@@ -1,5 +1,13 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
+// Tipos de conveniencia para queries
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type Module = Database["public"]["Tables"]["modules"]["Row"];
+export type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
+export type UserStats = Database["public"]["Tables"]["user_stats"]["Row"];
+export type Badge = Database["public"]["Tables"]["badges"]["Row"];
+export type UserBadge = Database["public"]["Tables"]["user_badges"]["Row"];
+
 export interface Database {
   public: {
     Tables: {
