@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendTelegramMessage, buildReminderMessage } from "@/lib/telegram/bot";
 
-// Este endpoint lo llama un cron job cada hora (ej. Vercel Cron o cron externo)
-// Protegido con un token secreto en el header Authorization
-export async function POST(req: NextRequest) {
+// Vercel Cron llama con GET. También acepta POST para llamadas manuales.
+async function handleNotifications(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET ?? "tradelingo-cron-secret";
 
@@ -78,12 +77,12 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(results);
 }
 
-// GET para comprobar el estado del cron (sin autenticación, solo info)
-export async function GET() {
-  const currentHour = new Date().getUTCHours();
-  return NextResponse.json({
-    status: "ok",
-    current_utc_hour: currentHour,
-    info: "Llama a POST con Authorization: Bearer <CRON_SECRET> para disparar notificaciones",
-  });
+// Vercel Cron llama con GET — ejecuta las notificaciones directamente
+export async function GET(req: NextRequest) {
+  return handleNotifications(req);
+}
+
+// POST para llamadas manuales con Authorization header
+export async function POST(req: NextRequest) {
+  return handleNotifications(req);
 }

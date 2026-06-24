@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/notifications/telegram",
+      "schedule": "0 * * * *"
+    }
+  ],
+  "functions": {
+    "app/api/ai/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}
