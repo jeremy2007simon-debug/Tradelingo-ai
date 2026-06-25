@@ -5,31 +5,30 @@ export async function GET() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return NextResponse.json({
-      error: "Variables de entorno no configuradas",
-      url: url ? "✓ presente" : "✗ falta",
-      key: key ? "✓ presente" : "✗ falta",
-    });
+    return NextResponse.json({ error: "Variables no configuradas" });
   }
 
-  try {
-    const res = await fetch(`${url}/auth/v1/settings`, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-      },
-    });
+  // Test signup directo con email de prueba
+  const res = await fetch(`${url}/auth/v1/signup`, {
+    method: "POST",
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: `test_${Date.now()}@example.com`,
+      password: "TestPassword123!",
+    }),
+  });
 
-    const data = await res.json();
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = text; }
 
-    return NextResponse.json({
-      status: res.status,
-      ok: res.ok,
-      url: url.substring(0, 30) + "...",
-      key_prefix: key.substring(0, 20) + "...",
-      supabase_response: data,
-    });
-  } catch (e) {
-    return NextResponse.json({ error: String(e) });
-  }
+  return NextResponse.json({
+    status: res.status,
+    ok: res.ok,
+    response: data,
+  });
 }
