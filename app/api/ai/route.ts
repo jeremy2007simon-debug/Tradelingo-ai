@@ -51,14 +51,16 @@ async function saveConversation(
     timestamp: new Date().toISOString(),
   }));
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as unknown as any;
   if (conversationId) {
-    await (supabase as unknown as any)
+    await db
       .from("ai_conversations")
       .update({ messages: messagesWithTimestamp, updated_at: new Date().toISOString() })
       .eq("id", conversationId)
       .eq("user_id", userId);
   } else {
-    await (supabase as unknown as any)
+    await db
       .from("ai_conversations")
       .insert({ user_id: userId, messages: messagesWithTimestamp });
   }

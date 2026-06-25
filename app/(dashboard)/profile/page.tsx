@@ -10,12 +10,11 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [profileRes, statsRes, badgesRes, progressRes, modulesRes] = await Promise.all([
+  const [profileRes, statsRes, badgesRes, progressRes] = await Promise.all([
     supabase.from("profiles").select("username, avatar_url, created_at").eq("id", user.id).single(),
     supabase.from("user_stats").select("*").eq("user_id", user.id).single(),
     supabase.from("user_badges").select("earned_at, badges(id, slug, title, description, icon)").eq("user_id", user.id).order("earned_at", { ascending: false }),
     supabase.from("user_lesson_progress").select("lesson_id").eq("user_id", user.id).eq("completed", true),
-    supabase.from("modules").select("id, title, icon, required_xp").order("order_index"),
   ]);
 
   const profile = profileRes.data as { username: string | null; avatar_url: string | null; created_at: string } | null;

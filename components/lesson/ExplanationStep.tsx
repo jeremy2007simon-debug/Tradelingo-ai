@@ -1,5 +1,6 @@
 "use client";
 
+import ReactMarkdown from "react-markdown";
 import { Lightbulb, BookOpen } from "lucide-react";
 
 interface ExplanationStepProps {
@@ -8,28 +9,35 @@ interface ExplanationStepProps {
   onNext: () => void;
 }
 
+const proseClasses = `
+  prose prose-sm prose-invert max-w-none
+  prose-p:text-slate-300 prose-p:leading-relaxed prose-p:my-2
+  prose-strong:text-white prose-strong:font-semibold
+  prose-ul:text-slate-300 prose-ul:my-2 prose-li:my-1
+  prose-ol:text-slate-300 prose-ol:my-2
+  prose-headings:text-white prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
+`.trim();
+
 export default function ExplanationStep({ explanation, example, onNext }: ExplanationStepProps) {
   return (
     <div className="space-y-6 animate-slide-up">
-      {/* Explicación */}
       <div className="card">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="text-brand-400 w-5 h-5" />
           <h2 className="text-brand-400 font-semibold">Explicación</h2>
         </div>
-        <div className="text-slate-300 leading-relaxed whitespace-pre-line text-sm md:text-base">
-          {explanation}
+        <div className={proseClasses}>
+          <ReactMarkdown>{explanation}</ReactMarkdown>
         </div>
       </div>
 
-      {/* Ejemplo práctico */}
       <div className="card border-xp/20 bg-xp/5">
         <div className="flex items-center gap-2 mb-4">
           <Lightbulb className="text-xp w-5 h-5" />
           <h2 className="text-xp font-semibold">Ejemplo práctico</h2>
         </div>
-        <div className="text-slate-300 leading-relaxed whitespace-pre-line text-sm md:text-base">
-          {example}
+        <div className={proseClasses}>
+          <ReactMarkdown>{example}</ReactMarkdown>
         </div>
       </div>
 

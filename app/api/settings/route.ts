@@ -62,6 +62,7 @@ export async function PATCH(req: NextRequest) {
   if (updates.telegram_id !== undefined) updatePayload.telegram_id = updates.telegram_id || null;
   if (updates.notify_hour !== undefined) updatePayload.notify_hour = updates.notify_hour;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase as unknown as any)
     .from("profiles")
     .update(updatePayload)

@@ -20,17 +20,16 @@ export default async function ModuleDetailPage({ params }: Props) {
     supabase.from("user_stats").select("total_xp").eq("user_id", user.id).single(),
   ]);
 
-  const moduleData = moduleRes.data as Module | null;
-  if (!moduleData) notFound();
+  const mod = moduleRes.data as Module | null;
+  if (!mod) notFound();
 
-  const module = moduleData;
   const totalXP = ((statsRes.data as UserStats | null)?.total_xp) ?? 0;
-  const unlocked = totalXP >= module.required_xp;
+  const unlocked = totalXP >= mod.required_xp;
 
   if (!unlocked) redirect("/modules");
 
   const [lessonsRes, progressRes] = await Promise.all([
-    supabase.from("lessons").select("id, title, order_index, xp_reward").eq("module_id", module.id).order("order_index"),
+    supabase.from("lessons").select("id, title, order_index, xp_reward").eq("module_id", mod.id).order("order_index"),
     supabase.from("user_lesson_progress").select("lesson_id, completed, score").eq("user_id", user.id),
   ]);
 
@@ -55,15 +54,15 @@ export default async function ModuleDetailPage({ params }: Props) {
       </Link>
 
       {/* Cabecera del módulo */}
-      <div className="card" style={{ borderColor: `${module.color}44` }}>
+      <div className="card" style={{ borderColor: `${mod.color}44` }}>
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl flex-shrink-0" style={{ backgroundColor: `${module.color}22` }}>
-            {module.icon}
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center text-4xl flex-shrink-0" style={{ backgroundColor: `${mod.color}22` }}>
+            {mod.icon}
           </div>
           <div className="flex-1">
-            <p className="text-slate-500 text-sm mb-1">Módulo {module.order_index}</p>
-            <h1 className="text-white font-bold text-xl mb-1">{module.title}</h1>
-            <p className="text-slate-400 text-sm mb-4">{module.description}</p>
+            <p className="text-slate-500 text-sm mb-1">Módulo {mod.order_index}</p>
+            <h1 className="text-white font-bold text-xl mb-1">{mod.title}</h1>
+            <p className="text-slate-400 text-sm mb-4">{mod.description}</p>
             <div className="flex items-center gap-3">
               <ProgressBar percent={percent} height="h-2" />
               <span className="text-slate-500 text-xs flex-shrink-0">{completedCount}/{lessons.length} lecciones</span>

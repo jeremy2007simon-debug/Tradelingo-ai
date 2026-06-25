@@ -64,6 +64,7 @@ async function handleNotifications(req: NextRequest) {
     const { ok } = await sendTelegramMessage(user.telegram_id, message);
 
     // Guardar log
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as unknown as any).from("notification_log").insert({
       user_id: user.id,
       channel: "telegram",
