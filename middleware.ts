@@ -32,7 +32,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
-  const isPublicRoute = pathname === "/" || isAuthRoute || pathname.startsWith("/api/notifications");
+  const isPublicRoute =
+    pathname === "/" ||
+    isAuthRoute ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/api/notifications");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
@@ -41,6 +47,13 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // Usuarios autenticados no necesitan forgot-password
+  if (user && pathname.startsWith("/forgot-password")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
