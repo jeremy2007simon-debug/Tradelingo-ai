@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, CheckCircle, AlertCircle, Send, Bell, User, ExternalLink } from "lucide-react";
+import { Save, Loader2, CheckCircle, AlertCircle, Send, Bell, User } from "lucide-react";
 
 interface Settings {
   username: string;
@@ -115,28 +115,20 @@ export default function SettingsPage() {
 
           {/* Instrucciones */}
           <div className="bg-brand-600/10 border border-brand-600/20 rounded-xl p-4 text-sm space-y-2">
-            <p className="text-brand-300 font-medium">Cómo conectar Telegram:</p>
+            <p className="text-brand-300 font-medium">Cómo obtener tu Chat ID:</p>
             <ol className="text-slate-400 space-y-1.5 list-decimal list-inside">
               <li>
-                Busca tu bot en Telegram:{" "}
-                <span className="text-brand-400 font-mono">@TradeLingo_bot</span>
-                {" "}(o el nombre que le diste)
+                Abre Telegram y busca{" "}
+                <span className="text-brand-400 font-mono">@userinfobot</span>
               </li>
-              <li>Envíale el mensaje <span className="text-white font-mono">/start</span></li>
-              <li>
-                Ve a{" "}
-                <a
-                  href="https://api.telegram.org/bot{TU_TOKEN}/getUpdates"
-                  className="text-brand-400 underline inline-flex items-center gap-1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  getUpdates <ExternalLink className="w-3 h-3" />
-                </a>
-                {" "}y copia tu <span className="text-white">chat.id</span>
-              </li>
-              <li>Pégalo en el campo de abajo y guarda</li>
+              <li>Pulsa <span className="text-white font-mono">/start</span></li>
+              <li>El bot te responderá con tu <span className="text-white font-semibold">Id</span> (número)</li>
+              <li>Pega ese número en el campo de abajo y guarda</li>
             </ol>
+            <p className="text-slate-500 pt-1">
+              Al guardar, recibirás un mensaje de confirmación de{" "}
+              <span className="text-brand-400 font-mono">@TradeLingo_bot</span>.
+            </p>
           </div>
 
           <div>
