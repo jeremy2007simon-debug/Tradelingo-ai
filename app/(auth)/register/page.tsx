@@ -38,9 +38,10 @@ export default function RegisterPage() {
     });
 
     if (signUpError) {
-      setError(signUpError.message === "User already registered"
-        ? "Este email ya está registrado."
-        : "Error al crear la cuenta. Inténtalo de nuevo."
+      setError(
+        signUpError.message === "User already registered"
+          ? "Este email ya está registrado."
+          : signUpError.message || "Error al crear la cuenta. Inténtalo de nuevo."
       );
       setLoading(false);
       return;
