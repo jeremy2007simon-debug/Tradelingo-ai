@@ -19,12 +19,18 @@ interface LessonData {
   modules: { title: string; slug: string; icon: string; color: string };
 }
 
+interface EarnedBadge {
+  slug: string;
+  title: string;
+  icon: string;
+}
+
 interface CompletionResult {
   xp_earned: number;
   new_xp: number;
   new_level: number;
   new_streak: number;
-  earned_badges: string[];
+  earned_badges: EarnedBadge[];
   already_completed: boolean;
 }
 

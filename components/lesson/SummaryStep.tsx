@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { Zap, Flame, Trophy, ArrowRight, RotateCcw } from "lucide-react";
 import Link from "next/link";
 
+interface EarnedBadge {
+  slug: string;
+  title: string;
+  icon: string;
+}
+
 interface SummaryStepProps {
   summary: string;
   xpEarned: number;
@@ -13,7 +19,7 @@ interface SummaryStepProps {
   quizScore: number;
   moduleSlug: string;
   nextLessonId: number | null;
-  earnedBadges: string[];
+  earnedBadges: EarnedBadge[];
   alreadyCompleted: boolean;
 }
 
@@ -38,7 +44,6 @@ export default function SummaryStep({
 
   return (
     <div className="space-y-6 animate-slide-up">
-      {/* Recompensa XP */}
       {!alreadyCompleted && (
         <div className={`card border-xp/30 bg-xp/5 text-center transition-all duration-500 ${showXP ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-xp/20 mb-3 mx-auto animate-xp-pop">
@@ -58,7 +63,6 @@ export default function SummaryStep({
         </div>
       )}
 
-      {/* Stats rápidas */}
       <div className="grid grid-cols-3 gap-3">
         <div className="card text-center p-3">
           <p className="text-slate-500 text-xs mb-1">Puntuación</p>
@@ -77,30 +81,30 @@ export default function SummaryStep({
         </div>
       </div>
 
-      {/* Insignias ganadas */}
       {earnedBadges.length > 0 && (
-        <div className="card border-brand-600/30">
+        <div className="card border-xp/30 bg-xp/5">
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="text-xp w-5 h-5" />
-            <span className="text-white font-semibold">¡Insignia{earnedBadges.length > 1 ? "s" : ""} obtenida{earnedBadges.length > 1 ? "s" : ""}!</span>
+            <span className="text-white font-semibold">
+              {earnedBadges.length === 1 ? "¡Insignia desbloqueada!" : `¡${earnedBadges.length} insignias desbloqueadas!`}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {earnedBadges.map((slug) => (
-              <span key={slug} className="bg-xp/10 border border-xp/30 text-xp text-xs font-medium px-3 py-1.5 rounded-full">
-                🏆 {slug.replace(/-/g, " ")}
-              </span>
+          <div className="flex flex-col gap-2">
+            {earnedBadges.map((badge) => (
+              <div key={badge.slug} className="flex items-center gap-3 bg-surface-card rounded-xl px-4 py-2.5">
+                <span className="text-2xl">{badge.icon}</span>
+                <span className="text-white font-medium text-sm">{badge.title}</span>
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Resumen */}
       <div className="card">
         <h3 className="text-white font-semibold mb-3">Resumen de la lección</h3>
         <p className="text-slate-300 text-sm leading-relaxed">{summary}</p>
       </div>
 
-      {/* Navegación */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Link href={`/modules/${moduleSlug}`} className="btn-secondary flex-1 text-center">
           Volver al módulo

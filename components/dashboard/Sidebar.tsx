@@ -4,17 +4,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   TrendingUp, LayoutDashboard, BookOpen, MessageCircle,
-  Settings, LogOut, Trophy
+  Settings, LogOut, Trophy, Medal
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import clsx from "clsx";
 
 const navItems = [
-  { href: "/dashboard",  icon: LayoutDashboard, label: "Panel" },
-  { href: "/modules",    icon: BookOpen,         label: "Módulos" },
-  { href: "/chat",       icon: MessageCircle,    label: "Profesor IA" },
-  { href: "/profile",    icon: Trophy,           label: "Mi progreso" },
-  { href: "/settings",   icon: Settings,         label: "Ajustes" },
+  { href: "/dashboard",    icon: LayoutDashboard, label: "Panel" },
+  { href: "/modules",      icon: BookOpen,         label: "Módulos" },
+  { href: "/chat",         icon: MessageCircle,    label: "Profesor IA" },
+  { href: "/leaderboard",  icon: Medal,            label: "Ranking" },
+  { href: "/profile",      icon: Trophy,           label: "Mi progreso" },
+  { href: "/settings",     icon: Settings,         label: "Ajustes" },
 ];
 
 export default function Sidebar() {

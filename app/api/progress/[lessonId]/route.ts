@@ -8,8 +8,6 @@ interface Props {
   params: Promise<{ lessonId: string }>;
 }
 
-// El SDK de Supabase con claves sb_publishable no infiere tipos en writes correctamente.
-// Usamos un helper tipado-as-any solo para operaciones de escritura.
 function db(supabase: any) {
   return supabase as {
     from: (table: string) => {
@@ -77,7 +75,7 @@ export async function POST(req: NextRequest, { params }: Props) {
     { onConflict: "user_id" }
   );
 
-  const earnedBadges: string[] = [];
+  const earnedBadges: { slug: string; title: string; icon: string }[] = [];
 
   const { count } = await supabase
     .from("user_lesson_progress")
@@ -85,26 +83,77 @@ export async function POST(req: NextRequest, { params }: Props) {
     .eq("user_id", user.id)
     .eq("completed", true);
 
-  if (count === 1 && await awardBadge(supabase, user.id, "primera-leccion")) earnedBadges.push("primera-leccion");
+  if (count === 1) {
+    const b = await awardBadge(supabase, user.id, "primera-leccion");
+    if (b) earnedBadges.push(b);
+  }
 
   for (const t of BADGE_THRESHOLDS.streak) {
-    if (newStreak >= t && await awardBadge(supabase, user.id, `racha-${t}`)) earnedBadges.push(`racha-${t}`);
-  }
-  for (const t of BADGE_THRESHOLDS.levels) {
-    if (newLevel >= t && await awardBadge(supabase, user.id, `nivel-${t}`)) earnedBadges.push(`nivel-${t}`);
+    if (newStreak >= t) {
+      const b = await awardBadge(supabase, user.id, `racha-${t}`);
+      if (b) earnedBadges.push(b);
+    }
   }
 
-  return NextResponse.json({ xp_earned: lesson.xp_reward, new_xp: newXP, new_level: newLevel, new_streak: newStreak, earned_badges: earnedBadges, already_completed: false });
+  for (const t of BADGE_THRESHOLDS.levels) {
+    if (newLevel >= t) {
+      const b = await awardBadge(supabase, user.id, `nivel-${t}`);
+      if (b) earnedBadges.push(b);
+    }
+  }
+
+  // Verificar si el módulo completo fue terminado
+  const { data: moduleLessonsRaw } = await supabase
+    .from("lessons")
+    .select("id")
+    .eq("module_id", lesson.module_id);
+  const moduleLessonIds = ((moduleLessonsRaw ?? []) as { id: number }[]).map((l) => l.id);
+
+  if (moduleLessonIds.length > 0) {
+    const { count: completedCount } = await supabase
+      .from("user_lesson_progress")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("completed", true)
+      .in("lesson_id", moduleLessonIds);
+
+    if (completedCount === moduleLessonIds.length) {
+      // Módulo completado — buscar badge correspondiente
+      const { data: moduleRaw } = await supabase.from("modules").select("slug").eq("id", lesson.module_id).single();
+      const moduleSlug = (moduleRaw as { slug: string } | null)?.slug;
+      if (moduleSlug) {
+        const badgeSlug = moduleSlug === "fundamentos" ? "modulo-1"
+          : moduleSlug === "gestion-riesgo" ? "modulo-riesgo" : null;
+        if (badgeSlug) {
+          const b = await awardBadge(supabase, user.id, badgeSlug);
+          if (b) earnedBadges.push(b);
+        }
+      }
+    }
+  }
+
+  return NextResponse.json({
+    xp_earned: lesson.xp_reward,
+    new_xp: newXP,
+    new_level: newLevel,
+    new_streak: newStreak,
+    earned_badges: earnedBadges,
+    already_completed: false,
+  });
 }
 
-async function awardBadge(supabase: any, userId: string, slug: string): Promise<boolean> {
-  const { data: badgeRaw } = await supabase.from("badges").select("id").eq("slug", slug).single();
-  const badge = badgeRaw as { id: number } | null;
-  if (!badge) return false;
+async function awardBadge(
+  supabase: any,
+  userId: string,
+  slug: string
+): Promise<{ slug: string; title: string; icon: string } | null> {
+  const { data: badgeRaw } = await supabase.from("badges").select("id, title, icon").eq("slug", slug).single();
+  const badge = badgeRaw as { id: number; title: string; icon: string } | null;
+  if (!badge) return null;
 
   const { data: existing } = await supabase.from("user_badges").select("badge_id").eq("user_id", userId).eq("badge_id", badge.id).single();
-  if (existing) return false;
+  if (existing) return null;
 
   await db(supabase).from("user_badges").insert({ user_id: userId, badge_id: badge.id });
-  return true;
+  return { slug, title: badge.title, icon: badge.icon };
 }
