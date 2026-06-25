@@ -38,10 +38,12 @@ export default function RegisterPage() {
     });
 
     if (signUpError) {
+      console.error("Supabase signUp error:", signUpError);
+      const msg = signUpError.message;
       setError(
-        signUpError.message === "User already registered"
+        msg === "User already registered"
           ? "Este email ya está registrado."
-          : signUpError.message || "Error al crear la cuenta. Inténtalo de nuevo."
+          : `Error: ${msg || JSON.stringify(signUpError)}`
       );
       setLoading(false);
       return;
