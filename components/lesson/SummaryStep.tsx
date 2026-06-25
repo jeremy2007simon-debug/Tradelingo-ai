@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Zap, Flame, Trophy, ArrowRight, RotateCcw } from "lucide-react";
+import { Zap, Flame, Trophy, ArrowRight, RotateCcw, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
 interface EarnedBadge {
@@ -18,6 +18,7 @@ interface SummaryStepProps {
   newStreak: number;
   quizScore: number;
   moduleSlug: string;
+  lessonTitle?: string;
   nextLessonId: number | null;
   earnedBadges: EarnedBadge[];
   alreadyCompleted: boolean;
@@ -31,6 +32,7 @@ export default function SummaryStep({
   newStreak,
   quizScore,
   moduleSlug,
+  lessonTitle,
   nextLessonId,
   earnedBadges,
   alreadyCompleted,
@@ -109,10 +111,18 @@ export default function SummaryStep({
         <Link href={`/modules/${moduleSlug}`} className="btn-secondary flex-1 text-center">
           Volver al módulo
         </Link>
-        {nextLessonId && (
+        {nextLessonId ? (
           <Link href={`/lesson/${nextLessonId}`} className="btn-primary flex-1 flex items-center justify-center gap-2">
             Siguiente lección
             <ArrowRight className="w-4 h-4" />
+          </Link>
+        ) : (
+          <Link
+            href={`/chat?q=${encodeURIComponent(`Acabo de completar la lección "${lessonTitle ?? "del módulo"}". ¿Puedes profundizar en algún punto clave o resolver dudas?`)}`}
+            className="btn-secondary flex-1 flex items-center justify-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Preguntar a Marco
           </Link>
         )}
       </div>

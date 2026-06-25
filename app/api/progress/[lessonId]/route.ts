@@ -118,14 +118,42 @@ export async function POST(req: NextRequest, { params }: Props) {
       .in("lesson_id", moduleLessonIds);
 
     if (completedCount === moduleLessonIds.length) {
-      // Módulo completado — buscar badge correspondiente
       const { data: moduleRaw } = await supabase.from("modules").select("slug").eq("id", lesson.module_id).single();
       const moduleSlug = (moduleRaw as { slug: string } | null)?.slug;
       if (moduleSlug) {
-        const badgeSlug = moduleSlug === "fundamentos" ? "modulo-1"
-          : moduleSlug === "gestion-riesgo" ? "modulo-riesgo" : null;
+        const MODULE_BADGE_MAP: Record<string, string> = {
+          "fundamentos":         "modulo-1",
+          "tipos-activos":       "modulo-2",
+          "velas-japonesas":     "modulo-3",
+          "tendencias":          "modulo-4",
+          "soporte-resistencia": "modulo-5",
+          "gestion-riesgo":      "modulo-riesgo",
+          "psicologia":          "modulo-7",
+          "backtesting":         "modulo-8",
+          "cuenta-demo":         "modulo-9",
+          "estrategia":          "modulo-10",
+        };
+        const badgeSlug = MODULE_BADGE_MAP[moduleSlug];
         if (badgeSlug) {
           const b = await awardBadge(supabase, user.id, badgeSlug);
+          if (b) earnedBadges.push(b);
+        }
+      }
+
+      // Verificar si TODOS los módulos están completos → badge "maestro"
+      const { data: allModulesRaw } = await supabase.from("modules").select("id");
+      const allModuleIds = ((allModulesRaw ?? []) as { id: number }[]).map((m) => m.id);
+      const { data: allModuleLessonsRaw } = await supabase.from("lessons").select("id").in("module_id", allModuleIds);
+      const allLessonIds = ((allModuleLessonsRaw ?? []) as { id: number }[]).map((l) => l.id);
+      if (allLessonIds.length > 0) {
+        const { count: totalCompleted } = await supabase
+          .from("user_lesson_progress")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true)
+          .in("lesson_id", allLessonIds);
+        if (totalCompleted === allLessonIds.length) {
+          const b = await awardBadge(supabase, user.id, "maestro");
           if (b) earnedBadges.push(b);
         }
       }

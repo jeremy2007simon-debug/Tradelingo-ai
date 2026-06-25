@@ -75,31 +75,34 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-surface-border z-40 flex justify-around px-2 py-2">
-        {navItems.slice(0, 4).map((item) => {
-          const active = pathname === item.href;
+      {/* Mobile bottom nav — muestra los 5 primeros items */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface-card border-t border-surface-border z-40 flex justify-around px-1 py-2">
+        {navItems.slice(0, 5).map((item) => {
+          const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
               href={item.href}
               className={clsx(
-                "flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-colors",
+                "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors",
                 active ? "text-brand-400" : "text-slate-500"
               )}
             >
               <item.icon className="w-5 h-5" />
-              <span>{item.label}</span>
+              <span className="truncate max-w-[48px] text-center">{item.label}</span>
             </Link>
           );
         })}
-        <button
-          onClick={handleLogout}
-          className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-slate-500"
+        <Link
+          href="/settings"
+          className={clsx(
+            "flex flex-col items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors",
+            pathname === "/settings" ? "text-brand-400" : "text-slate-500"
+          )}
         >
-          <LogOut className="w-5 h-5" />
-          <span>Salir</span>
-        </button>
+          <Settings className="w-5 h-5" />
+          <span>Ajustes</span>
+        </Link>
       </nav>
     </>
   );

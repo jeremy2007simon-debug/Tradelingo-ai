@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { TrendingUp, Trash2 } from "lucide-react";
 import ChatMessage from "@/components/chat/ChatMessage";
 import ChatInput from "@/components/chat/ChatInput";
@@ -22,16 +23,28 @@ Estoy aquí para ayudarte a entender los mercados financieros desde cero, explic
 };
 
 export default function ChatPage() {
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<ChatMessageType[]>([WELCOME_MESSAGE]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const sentInitialRef = useRef(false);
 
   // Auto-scroll al fondo
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent]);
+
+  // Pre-rellenar con pregunta de la URL ?q=
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && !sentInitialRef.current) {
+      sentInitialRef.current = true;
+      handleSend(q);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSend(userText: string) {
     const userMessage: ChatMessageType = { role: "user", content: userText };

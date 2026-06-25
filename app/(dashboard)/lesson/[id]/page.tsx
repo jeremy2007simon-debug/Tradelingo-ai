@@ -153,6 +153,7 @@ export default function LessonPage() {
           newStreak={result.new_streak}
           quizScore={quizScore}
           moduleSlug={lesson.modules.slug}
+          lessonTitle={lesson.title}
           nextLessonId={nextLessonId}
           earnedBadges={result.earned_badges}
           alreadyCompleted={result.already_completed}
