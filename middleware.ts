@@ -38,7 +38,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
     pathname.startsWith("/auth/") ||
-    pathname.startsWith("/api/notifications");
+    pathname.startsWith("/api/notifications") ||
+    pathname.startsWith("/api/debug-supabase");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
